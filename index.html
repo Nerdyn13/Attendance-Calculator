@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #calculator {
+            text-align: center;
+            max-width: 400px;
+            margin: 20px auto; 
+        }
+
+        .input-container {
+            display: flex;          
+            flex-direction: column; 
+            gap: 5px;       
+        }
+
+        .input-container input[type="number"],
+        .input-container button { 
+            padding: 10px;            
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .input-container button {
+            background-color: #008CBA;
+            color: white;
+            cursor: pointer;
+        } 
+
+        #attendanceReport {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+
+        .math-inline { 
+            font-family: 'Times New Roman', serif; 
+            font-style: italic;
+        } 
+
+        .percentage {
+            font-weight: bold;
+        }
+
+        .green {
+            color: green;
+        }
+
+        .yellow {
+            color: yellow;
+        }
+
+        .red {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="calculator">
+        <div class="input-container"> 
+            <input type="number" id="totalClassesInput" placeholder="Enter total number of classes">
+            <input type="number" id="classesPresentInput" placeholder="Enter number of classes present">
+            <button id="calculateButton">Calculate</button>
+        </div>
+    </div>
+    <div id="attendanceReport">
+    </div>
+
+    <script>
+        const calculateButton = document.getElementById('calculateButton');
+        const totalClassesInput = document.getElementById('totalClassesInput');
+        const classesPresentInput = document.getElementById('classesPresentInput');
+        const attendanceReportDiv = document.getElementById('attendanceReport');
+
+        calculateButton.addEventListener('click', () => {
+            const totalClasses = parseInt(totalClassesInput.value);
+            const classesPresent = parseInt(classesPresentInput.value);
+
+            if (isNaN(totalClasses) || isNaN(classesPresent)) {
+                alert('Please enter valid numbers');
+                return;
+            }
+
+            if (classesPresent > totalClasses) {
+                alert('Classes present cannot be more than total classes.');
+                return;
+            }
+
+            const attendancePercentage = (classesPresent / totalClasses) * 100;
+            let color = '';
+
+            if (attendancePercentage >= 75) {
+                color = 'green';
+            } else if (attendancePercentage >= 65) {
+                color = 'yellow';
+            } else {
+                color = 'red';
+            }
+
+            let message = '';
+            if (attendancePercentage < 75) {
+                const classesNeeded = ((75 / 100) * totalClasses) - classesPresent;
+                message = `<p>You need to attend <span>${Math.ceil(classesNeeded)}</span> more classes.</p>`;
+            } else {
+                const classesCanMiss = totalClasses - ((75 / 100) * totalClasses);
+                message = `<p>You can miss up to <span>${Math.floor(classesCanMiss)}</span> more classes.</p>`;
+            }
+
+            // Choose one of the options below for LaTeX rendering:
+
+            // **** Option 1: Simulating LaTeX Appearance ****
+            attendanceReportDiv.innerHTML = ` 
+                <p>Total Classes Conducted: <span class="math-inline">${totalClasses}</span></p>
+                <p>Classes Attended: <span class="math-inline">${classesPresent}</span></p>
+                <p>Attendance Percentage: <span class="percentage ${color} math-inline">${attendancePercentage.toFixed(2)}%</span></p>
+                ${message}
+            `;
+
+            // **** Option 2: Using KaTeX ****
+            // Include KaTeX's CSS: <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.css" integrity="sha384-bYdxxUwZy3s4r4tnE1xqMaojk/zNDBxvHQZqTdInNoGfG6Q0CSsO63s/z7aK0xO" crossorigin="anonymous"> 
+            attendanceReportDiv.innerHTML = ` 
+                <p>Total Classes Conducted: ${katex.renderToString(`{totalClasses}`)}</p>
+                <p>Classes Attended: ${katex.renderToString(`{classesPresent}`)}</p>
+                <p>Attendance Percentage: <span class="percentage ${color}">${katex.renderToString(`${attendancePercentage.toFixed(2)}\\%`)}</span></p>
+                ${message}
+            `;
+
+            attendanceReportDiv.style.color = color; 
+        });
+    </script>
+</body>
+</html>
